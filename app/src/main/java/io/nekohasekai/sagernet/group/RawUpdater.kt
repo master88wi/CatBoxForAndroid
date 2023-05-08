@@ -319,7 +319,7 @@ object RawUpdater : GroupUpdater() {
 
                                     "ws-opts", "ws-opt" -> for (wsOpt in (opt.value as Map<String, Any>)) {
                                         when (wsOpt.key.lowercase()) {
-                                            "headers" -> for (wsHeader in (opt.value as Map<String, Any>)) {
+                                            "headers" -> for (wsHeader in (wsOpt.value as Map<String, Any>)) {
                                                 when (wsHeader.key.lowercase()) {
                                                     "host" -> bean.host = wsHeader.value.toString()
                                                 }
@@ -410,7 +410,7 @@ object RawUpdater : GroupUpdater() {
 
                                     "ws-opts", "ws-opt" -> for (wsOpt in (opt.value as Map<String, Any>)) {
                                         when (wsOpt.key.lowercase()) {
-                                            "headers" -> for (wsHeader in (opt.value as Map<String, Any>)) {
+                                            "headers" -> for (wsHeader in (wsOpt.value as Map<String, Any>)) {
                                                 when (wsHeader.key.lowercase()) {
                                                     "host" -> bean.host = wsHeader.value.toString()
                                                 }
@@ -534,6 +534,7 @@ object RawUpdater : GroupUpdater() {
         if (localAddresses.isNullOrEmpty()) error("Empty address in 'Interface' selection")
         bean.localAddress = localAddresses.flatMap { it.split(",") }.joinToString("\n")
         bean.privateKey = iface["PrivateKey"]
+        bean.mtu = iface["MTU"]?.toIntOrNull()
         val peers = ini.getAll("Peer")
         if (peers.isNullOrEmpty()) error("Missing 'Peer' selections")
         val beans = mutableListOf<WireGuardBean>()

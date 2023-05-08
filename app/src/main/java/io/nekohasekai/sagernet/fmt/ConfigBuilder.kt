@@ -148,12 +148,8 @@ fun buildConfig(
             rule.outbound.takeIf { it > 0 && it != proxy.id }
         }.toHashSet().toList()).associateBy { it.id }
     val buildSelector = !forTest && group?.isSelector == true && !forExport
-    val uidListDNSRemote = mutableListOf<Int>()
-    val uidListDNSDirect = mutableListOf<Int>()
-    val domainListDNSRemote = mutableListOf<String>()
-    val domainListDNSDirect = mutableListOf<String>()
+    val userDNSRuleList = mutableListOf<DNSRule_DefaultOptions>()
     val domainListDNSDirectForce = mutableListOf<String>()
-    val domainListDNSBlock = mutableListOf<String>()
     val bypassDNSBeans = hashSetOf<AbstractBean>()
     val isVPN = DataStore.serviceMode == Key.MODE_VPN
     val bind = if (!forTest && DataStore.allowAccess) "0.0.0.0" else LOCALHOST
@@ -214,6 +210,7 @@ fun buildConfig(
                 IPv6Mode.DISABLE -> {
                     strategy = "ipv4_only"
                 }
+
                 IPv6Mode.ONLY -> {
                     strategy = "ipv6_only"
                 }
@@ -234,9 +231,11 @@ fun buildConfig(
                     IPv6Mode.DISABLE -> {
                         inet4_address = listOf(VpnService.PRIVATE_VLAN4_CLIENT + "/28")
                     }
+
                     IPv6Mode.ONLY -> {
                         inet6_address = listOf(VpnService.PRIVATE_VLAN6_CLIENT + "/126")
                     }
+
                     else -> {
                         inet4_address = listOf(VpnService.PRIVATE_VLAN4_CLIENT + "/28")
                         inet6_address = listOf(VpnService.PRIVATE_VLAN6_CLIENT + "/126")
@@ -389,20 +388,28 @@ fun buildConfig(
                     currentOutbound = when (bean) {
                         is ConfigBean ->
                             gson.fromJson(bean.config, currentOutbound.javaClass)
+
                         is ShadowTLSBean -> // before StandardV2RayBean
                             buildSingBoxOutboundShadowTLSBean(bean).asMap()
+
                         is StandardV2RayBean -> // http/trojan/vmess/vless
                             buildSingBoxOutboundStandardV2RayBean(bean).asMap()
+
                         is HysteriaBean ->
                             buildSingBoxOutboundHysteriaBean(bean).asMap()
+
                         is SOCKSBean ->
                             buildSingBoxOutboundSocksBean(bean).asMap()
+
                         is ShadowsocksBean ->
                             buildSingBoxOutboundShadowsocksBean(bean).asMap()
+
                         is WireGuardBean ->
                             buildSingBoxOutboundWireguardBean(bean).asMap()
+
                         is SSHBean ->
                             buildSingBoxOutboundSSHBean(bean).asMap()
+
                         else -> throw IllegalStateException("can't reach")
                     }
 
@@ -518,7 +525,7 @@ fun buildConfig(
             if (rule.packages.isNotEmpty()) {
                 PackageCache.awaitLoadSync()
             }
-            val uidList2 = rule.packages.map {
+            val uidList = rule.packages.map {
                 if (!isVPN) {
                     alerts.add(0 to rule.displayName())
                 }
@@ -526,14 +533,14 @@ fun buildConfig(
             }.toHashSet().filterNotNull()
 
             val ruleObj = Rule_DefaultOptions().apply {
-                if (uidList2.isNotEmpty()) {
+                if (uidList.isNotEmpty()) {
                     PackageCache.awaitLoadSync()
-                    user_id = uidList2
+                    user_id = uidList
                 }
-                var domainList2: List<String>? = null
+                var domainList: List<String>? = null
                 if (rule.domains.isNotBlank()) {
-                    domainList2 = rule.domains.split("\n")
-                    makeSingBoxRule(domainList2, false)
+                    domainList = rule.domains.split("\n")
+                    makeSingBoxRule(domainList, false)
                 }
                 if (rule.ip.isNotBlank()) {
                     makeSingBoxRule(rule.ip.split("\n"), true)
@@ -572,14 +579,23 @@ fun buildConfig(
 
                 // also bypass lookup
                 // cannot use other outbound profile to lookup...
+                val dnsRuleObj = DNSRule_DefaultOptions().apply {
+                    if (uidList.isNotEmpty()) user_id = uidList
+                    domainList?.let { makeSingBoxRule(it) }
+                }
                 if (rule.outbound == -1L) {
-                    uidListDNSDirect += uidList2
-                    if (domainList2 != null) domainListDNSDirect += domainList2
+                    userDNSRuleList += dnsRuleObj.apply { server = "dns-direct" }
                 } else if (rule.outbound == 0L) {
-                    uidListDNSRemote += uidList2
-                    if (domainList2 != null) domainListDNSRemote += domainList2
+                    if (useFakeDns) userDNSRuleList += dnsRuleObj.apply {
+                        server = "dns-fake"
+                        inbound = listOf("tun-in")
+                    }
+                    userDNSRuleList += dnsRuleObj.apply {
+                        server = "dns-remote"
+                        inbound = null
+                    }
                 } else if (rule.outbound == -2L) {
-                    if (domainList2 != null) domainListDNSBlock += domainList2
+                    userDNSRuleList += dnsRuleObj.apply { server = "dns-block" }
                 }
 
                 outbound = when (val outId = rule.outbound) {
@@ -690,76 +706,20 @@ fun buildConfig(
 
         // dns object user rules
         if (enableDnsRouting) {
-            val dnsRuleObj = mutableListOf<DNSRule_DefaultOptions>()
-            if (uidListDNSRemote.isNotEmpty()) {
-                if (useFakeDns) dnsRuleObj.add(
-                    DNSRule_DefaultOptions().apply {
-                        user_id = uidListDNSRemote.toHashSet().toList()
-                        server = "dns-fake"
-                        inbound = listOf("tun-in")
-                    }
-                )
-                dnsRuleObj.add(
-                    DNSRule_DefaultOptions().apply {
-                        user_id = uidListDNSRemote.toHashSet().toList()
-                        server = "dns-remote"
-                    }
-                )
-            }
-            if (domainListDNSRemote.isNotEmpty()) {
-                if (useFakeDns) dnsRuleObj.add(
-                    DNSRule_DefaultOptions().apply {
-                        makeSingBoxRule(domainListDNSRemote.toHashSet().toList())
-                        server = "dns-fake"
-                        inbound = listOf("tun-in")
-                    }
-                )
-                dnsRuleObj.add(
-                    DNSRule_DefaultOptions().apply {
-                        makeSingBoxRule(domainListDNSRemote.toHashSet().toList())
-                        server = "dns-remote"
-                    }
-                )
-            }
-            if (uidListDNSDirect.isNotEmpty()) {
-                dnsRuleObj.add(
-                    DNSRule_DefaultOptions().apply {
-                        user_id = uidListDNSDirect.toHashSet().toList()
-                        server = "dns-direct"
-                    }
-                )
-            }
-            if (domainListDNSDirect.isNotEmpty()) {
-                dnsRuleObj.add(
-                    DNSRule_DefaultOptions().apply {
-                        makeSingBoxRule(domainListDNSDirect.toHashSet().toList())
-                        server = "dns-direct"
-                    }
-                )
-            }
-            if (domainListDNSBlock.isNotEmpty()) {
-                dnsRuleObj.add(
-                    DNSRule_DefaultOptions().apply {
-                        makeSingBoxRule(domainListDNSBlock.toHashSet().toList())
-                        server = "dns-block"
-                        disable_cache = true
-                    }
-                )
-            }
-            dnsRuleObj.forEach {
+            userDNSRuleList.forEach {
                 if (!it.checkEmpty()) dns.rules.add(it)
             }
         }
 
         if (forTest) {
-            // Disable DNS for test
+            // Always use system DNS for urlTest
             dns.servers = listOf(
                 DNSServerOptions().apply {
                     address = LOCAL_DNS_SERVER
                     tag = "dns-local"
                     detour = TAG_DIRECT
                 }
-            ) // Always use system DNS for urlTest
+            )
             dns.rules = listOf()
         } else {
             // built-in DNS rules
@@ -788,31 +748,30 @@ fun buildConfig(
                 server = "dns-block"
                 disable_cache = true
             })
-            // force bypass
+            // FakeDNS obj
+            if (useFakeDns) {
+                dns.servers.add(DNSServerOptions().apply {
+                    address = "fakedns://" + VpnService.FAKEDNS_VLAN4_CLIENT + "/15"
+                    tag = "dns-fake"
+                    strategy = "ipv4_only"
+                })
+                dns.rules.add(0, DNSRule_DefaultOptions().apply {
+                    auth_user = listOf("fakedns")
+                    server = "dns-remote"
+                })
+                dns.rules.add(DNSRule_DefaultOptions().apply {
+                    inbound = listOf("tun-in")
+                    server = "dns-fake"
+                    disable_cache = true
+                })
+            }
+            // force bypass (always top DNS rule)
             if (domainListDNSDirectForce.isNotEmpty()) {
                 dns.rules.add(0, DNSRule_DefaultOptions().apply {
                     makeSingBoxRule(domainListDNSDirectForce.toHashSet().toList())
                     server = "dns-direct"
                 })
             }
-        }
-
-        // fakedns obj
-        if (useFakeDns) {
-            dns.servers.add(DNSServerOptions().apply {
-                address = "fakedns://" + VpnService.FAKEDNS_VLAN4_CLIENT + "/15"
-                tag = "dns-fake"
-                strategy = "ipv4_only"
-            })
-            dns.rules.add(0, DNSRule_DefaultOptions().apply {
-                auth_user = listOf("fakedns")
-                server = "dns-remote"
-            })
-            dns.rules.add(DNSRule_DefaultOptions().apply {
-                inbound = listOf("tun-in")
-                server = "dns-fake"
-                disable_cache = true
-            })
         }
     }.let {
         ConfigBuildResult(
