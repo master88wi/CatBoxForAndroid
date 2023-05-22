@@ -205,6 +205,7 @@ fun buildConfig(
 
             servers = mutableListOf()
             rules = mutableListOf()
+            independent_cache = true
 
             when (ipv6Mode) {
                 IPv6Mode.DISABLE -> {
@@ -335,13 +336,6 @@ fun buildConfig(
                     bypassDNSBeans += proxyEntity.requireBean()
                 }
 
-                if (needGlobal) {
-                    globalOutbounds[proxyEntity.id]?.let {
-                        if (index == 0) chainTagOut = it // single, duplicate chain
-                        return@forEachIndexed
-                    }
-                }
-
                 // last profile set as "proxy"
                 if (chainId == 0L && index == 0) {
                     tagOut = TAG_PROXY
@@ -352,10 +346,6 @@ fun buildConfig(
                     tagOut = selectorName(bean.displayName())
                 }
 
-                // now tagOut is determined
-                if (needGlobal) {
-                    globalOutbounds[proxyEntity.id] = tagOut
-                }
 
                 // chain rules
                 if (index > 0) {
@@ -371,6 +361,15 @@ fun buildConfig(
                 } else {
                     // index == 0 means last profile in chain / not chain
                     chainTagOut = tagOut
+                }
+
+                // now tagOut is determined
+                if (needGlobal) {
+                    globalOutbounds[proxyEntity.id]?.let {
+                        if (index == 0) chainTagOut = it // single, duplicate chain
+                        return@forEachIndexed
+                    }
+                    globalOutbounds[proxyEntity.id] = tagOut
                 }
 
                 // Chain outbound
@@ -423,6 +422,11 @@ fun buildConfig(
                             currentOutbound["multiplex"] = MultiplexOptions().apply {
                                 enabled = true
                                 max_streams = DataStore.muxConcurrency
+                                protocol = when (DataStore.muxType) {
+                                    1 -> "smux"
+                                    2 -> "yamux"
+                                    else -> "h2mux"
+                                }
                             }
                         }
                     }
@@ -459,8 +463,8 @@ fun buildConfig(
                         }
                         if (Plugins.isUsingMatsuriExe(pluginId)) {
                             needExternal = false
-                        } else if (bean is HysteriaBean) {
-                            throw Exception("not supported hysteria-plugin (SagerNet)")
+                        } else if (pluginId.isNotBlank()) {
+                            throw Exception("You are using an unsupported $pluginId, please download the correct plugin.")
                         }
                     }
                     if (needExternal) {
@@ -568,7 +572,7 @@ fun buildConfig(
                     }
                 }
                 if (rule.network.isNotBlank()) {
-                    network = rule.network
+                    network = listOf(rule.network)
                 }
                 if (rule.source.isNotBlank()) {
                     source_ip_cidr = rule.source.split("\n")
