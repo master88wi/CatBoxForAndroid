@@ -6,9 +6,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
-	"time"
 	_ "unsafe"
-
 	"log"
 
 	"github.com/matsuridayo/libneko/neko_common"
@@ -66,21 +64,4 @@ func InitCore(process, cachePath, internalAssets, externalAssets string,
 	// nekoutils
 	nekoutils.Selector_OnProxySelected = iif.Selector_OnProxySelected
 
-	// Set up some component
-	go func() {
-		defer device.DeferPanicToError("InitCore-go", func(err error) { log.Println(err) })
-		device.GoDebug(process)
-
-		externalAssetsPath = externalAssets
-		internalAssetsPath = internalAssets
-
-		if time.Now().Unix() >= GetExpireTime() {
-			outdated = "Your version is too old! Please update!! 版本太旧，请升级！"
-		}
-
-		// bg
-		if isBgProcess {
-			extractAssets()
-		}
-	}()
 }
