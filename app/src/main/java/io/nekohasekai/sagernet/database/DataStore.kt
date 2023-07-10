@@ -13,7 +13,7 @@ import moe.matsuri.nb4a.TempDatabase
 
 object DataStore : OnPreferenceDataStoreChangeListener {
 
-    // share service state in main process
+    // share service state in main & bg process
     @Volatile
     var serviceState = BaseService.State.Idle
 
@@ -82,8 +82,7 @@ object DataStore : OnPreferenceDataStoreChangeListener {
     var nightTheme by configurationStore.stringToInt(Key.NIGHT_THEME)
     var serviceMode by configurationStore.string(Key.SERVICE_MODE) { Key.MODE_VPN }
 
-    //    var domainStrategy by configurationStore.string(Key.DOMAIN_STRATEGY) { "AsIs" }
-    var trafficSniffing by configurationStore.boolean(Key.TRAFFIC_SNIFFING) { true }
+    var trafficSniffing by configurationStore.stringToInt(Key.TRAFFIC_SNIFFING) { 1 }
     var resolveDestination by configurationStore.boolean(Key.RESOLVE_DESTINATION)
 
     //    var tcpKeepAliveInterval by configurationStore.stringToInt(Key.TCP_KEEP_ALIVE_INTERVAL) { 15 }
@@ -98,10 +97,8 @@ object DataStore : OnPreferenceDataStoreChangeListener {
 
     var remoteDns by configurationStore.string(Key.REMOTE_DNS) { "https://8.8.8.8/dns-query" }
     var directDns by configurationStore.string(Key.DIRECT_DNS) { "https://223.5.5.5/dns-query" }
-    var directDnsUseSystem by configurationStore.boolean(Key.DIRECT_DNS_USE_SYSTEM)
     var enableDnsRouting by configurationStore.boolean(Key.ENABLE_DNS_ROUTING) { true }
     var enableFakeDns by configurationStore.boolean(Key.ENABLE_FAKEDNS)
-    var dnsNetwork by configurationStore.stringSet(Key.DNS_NETWORK)
 
     var rulesProvider by configurationStore.stringToInt(Key.RULES_PROVIDER)
     var logLevel by configurationStore.stringToInt(Key.LOG_LEVEL)

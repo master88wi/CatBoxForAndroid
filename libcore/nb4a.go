@@ -2,11 +2,12 @@ package libcore
 
 import (
 	"libcore/device"
+	"log"
 	"os"
 	"path/filepath"
 	"runtime"
+	"time"
 	_ "unsafe"
-	"log"
 
 	"github.com/matsuridayo/libneko/neko_common"
 	"github.com/matsuridayo/libneko/neko_log"
@@ -29,18 +30,16 @@ func ForceGc() {
 	go runtime.GC()
 }
 
-func SetLocalResolver(lr LocalResolver) {
-	localResolver = lr
-}
-
 func InitCore(process, cachePath, internalAssets, externalAssets string,
 	maxLogSizeKb int32, logEnable bool,
-	iif NB4AInterface,
+	if1 NB4AInterface, if2 BoxPlatformInterface,
 ) {
 	defer device.DeferPanicToError("InitCore", func(err error) { log.Println(err) })
 
 	neko_common.RunMode = neko_common.RunMode_NekoBoxForAndroid
-	intfNB4A = iif
+	intfNB4A = if1
+	intfBox = if2
+	useProcfs = intfBox.UseProcFS()
 
 	// Working dir
 	tmp := filepath.Join(cachePath, "../no_backup")
@@ -55,11 +54,28 @@ func InitCore(process, cachePath, internalAssets, externalAssets string,
 		maxLogSizeKb = 50
 	}
 	neko_log.LogWriterDisable = !logEnable
-	// neko_log.NB4AGuiLogWriter = iif.(io.Writer)
+	neko_log.TruncateOnStart = isBgProcess
 	neko_log.SetupLog(int(maxLogSizeKb)*1024, filepath.Join(cachePath, "neko.log"))
 	boxmain.DisableColor()
 
 	// nekoutils
-	nekoutils.Selector_OnProxySelected = iif.Selector_OnProxySelected
+	nekoutils.Selector_OnProxySelected = intfNB4A.Selector_OnProxySelected
 
+	// Set up some component
+	go func() {
+		defer device.DeferPanicToError("InitCore-go", func(err error) { log.Println(err) })
+		device.GoDebug(process)
+
+		externalAssetsPath = externalAssets
+		internalAssetsPath = internalAssets
+
+		if time.Now().Unix() >= GetExpireTime() {
+			outdated = "Your version is too old! Please update!! 版本太旧，请升级！"
+		}
+
+		// bg
+		if isBgProcess {
+			extractAssets()
+		}
+	}()
 }

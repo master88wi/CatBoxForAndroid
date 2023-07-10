@@ -18,7 +18,8 @@ class TrafficLooper
 ) {
 
     private var job: Job? = null
-    private val items = mutableMapOf<Long, TrafficUpdater.TrafficLooperData>() // associate ent id
+    private val idMap = mutableMapOf<Long, TrafficUpdater.TrafficLooperData>() // id to 1 data
+    private val tagMap = mutableMapOf<String, TrafficUpdater.TrafficLooperData>() // tag to 1 data
 
     suspend fun stop() {
         job?.cancel()
@@ -27,7 +28,7 @@ class TrafficLooper
         val traffic = mutableMapOf<Long, TrafficData>()
         data.proxy?.config?.trafficMap?.forEach { (_, ents) ->
             for (ent in ents) {
-                val item = items[ent.id] ?: return@forEach
+                val item = idMap[ent.id] ?: return@forEach
                 ent.rx = item.rx
                 ent.tx = item.tx
                 ProfileManager.updateProfile(ent) // update DB
@@ -55,8 +56,8 @@ class TrafficLooper
 
     fun selectMain(id: Long) {
         Logs.d("select traffic count $TAG_PROXY to $id, old id is $selectorNowId")
-        val oldData = items[selectorNowId]
-        val newData = items[id] ?: return
+        val oldData = idMap[selectorNowId]
+        val newData = idMap[id] ?: return
         oldData?.apply {
             tag = selectorNowFakeTag
             ignore = true
@@ -89,19 +90,19 @@ class TrafficLooper
         var proxy: ProxyInstance?
 
         // for display
-        var itemMain: TrafficUpdater.TrafficLooperData? = null
-        var itemMainBase: TrafficUpdater.TrafficLooperData? = null
-        var itemBypass: TrafficUpdater.TrafficLooperData? = null
+        val itemBypass = TrafficUpdater.TrafficLooperData(tag = TAG_BYPASS)
 
         while (sc.isActive) {
-            delay(delayMs)
-            proxy = data.proxy ?: continue
+            proxy = data.proxy
+            if (proxy == null) {
+                delay(delayMs)
+                continue
+            }
 
             if (trafficUpdater == null) {
                 if (!proxy.isInitialized()) continue
-                items.clear()
-                itemBypass = TrafficUpdater.TrafficLooperData(tag = "bypass")
-                items[-1] = itemBypass
+                idMap.clear()
+                idMap[-1] = itemBypass
                 //
                 val tags = hashSetOf(TAG_PROXY, TAG_BYPASS)
                 proxy.config.trafficMap.forEach { (tag, ents) ->
@@ -111,30 +112,21 @@ class TrafficLooper
                             tag = tag,
                             rx = ent.rx,
                             tx = ent.tx,
+                            rxBase = ent.rx,
+                            txBase = ent.tx,
                             ignore = proxy.config.selectorGroupId >= 0L,
                         )
-                        if (tag == TAG_PROXY && itemMain == null) {
-                            itemMain = item
-                            itemMainBase = TrafficUpdater.TrafficLooperData(
-                                tag = tag,
-                                rx = ent.rx,
-                                tx = ent.tx,
-                            )
-                            Logs.d("traffic count $tag to main to ${ent.id}")
-                        }
-                        items[ent.id] = item
+                        idMap[ent.id] = item
+                        tagMap[tag] = item
                         Logs.d("traffic count $tag to ${ent.id}")
                     }
                 }
                 if (proxy.config.selectorGroupId >= 0L) {
-                    itemMain = TrafficUpdater.TrafficLooperData(tag = TAG_PROXY)
-                    itemMainBase = TrafficUpdater.TrafficLooperData(tag = TAG_PROXY)
-                    items[-2] = itemMain!!
                     selectMain(proxy.config.mainEntId)
                 }
                 //
                 trafficUpdater = TrafficUpdater(
-                    box = proxy.box, items = items.values.toList()
+                    box = proxy.box, items = idMap.values.toList()
                 )
                 proxy.box.setV2rayStats(tags.joinToString("\n"))
             }
@@ -142,14 +134,28 @@ class TrafficLooper
             trafficUpdater.updateAll()
             if (!sc.isActive) return
 
+            // add all non-bypass to "main"
+            var mainTxRate = 0L
+            var mainRxRate = 0L
+            var mainTx = 0L
+            var mainRx = 0L
+            tagMap.forEach { (_, it) ->
+                if (!it.ignore) {
+                    mainTxRate += it.txRate
+                    mainRxRate += it.rxRate
+                }
+                mainTx += it.tx - it.txBase
+                mainRx += it.rx - it.rxBase
+            }
+
             // speed
             val speed = SpeedDisplayData(
-                itemMain!!.txRate,
-                itemMain!!.rxRate,
-                if (showDirectSpeed) itemBypass!!.txRate else 0L,
-                if (showDirectSpeed) itemBypass!!.rxRate else 0L,
-                itemMain!!.tx - itemMainBase!!.tx,
-                itemMain!!.rx - itemMainBase!!.rx
+                mainTxRate,
+                mainRxRate,
+                if (showDirectSpeed) itemBypass.txRate else 0L,
+                if (showDirectSpeed) itemBypass.rxRate else 0L,
+                mainTx,
+                mainRx
             )
 
             // broadcast (MainActivity)
@@ -160,7 +166,7 @@ class TrafficLooper
                     if (data.binder.callbackIdMap[b] == SagerConnection.CONNECTION_ID_MAIN_ACTIVITY_FOREGROUND) {
                         b.cbSpeedUpdate(speed)
                         if (profileTrafficStatistics) {
-                            items.forEach { (id, item) ->
+                            idMap.forEach { (id, item) ->
                                 b.cbTrafficUpdate(
                                     TrafficData(id = id, rx = item.rx, tx = item.tx) // display
                                 )
@@ -174,6 +180,8 @@ class TrafficLooper
             data.notification?.apply {
                 if (listenPostSpeed) postNotificationSpeedUpdate(speed)
             }
+
+            delay(delayMs)
         }
     }
 }

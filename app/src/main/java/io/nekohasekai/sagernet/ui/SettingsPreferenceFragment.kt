@@ -79,7 +79,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         val portLocalDns = findPreference<EditTextPreference>(Key.LOCAL_DNS_PORT)!!
         val showDirectSpeed = findPreference<SwitchPreference>(Key.SHOW_DIRECT_SPEED)!!
         val ipv6Mode = findPreference<Preference>(Key.IPV6_MODE)!!
-//        val domainStrategy = findPreference<Preference>(Key.DOMAIN_STRATEGY)!!
         val trafficSniffing = findPreference<Preference>(Key.TRAFFIC_SNIFFING)!!
 
         val muxConcurrency = findPreference<EditTextPreference>(Key.MUX_CONCURRENCY)!!
@@ -91,21 +90,8 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
 
         val remoteDns = findPreference<EditTextPreference>(Key.REMOTE_DNS)!!
         val directDns = findPreference<EditTextPreference>(Key.DIRECT_DNS)!!
-        val directDnsUseSystem = findPreference<SwitchPreference>(Key.DIRECT_DNS_USE_SYSTEM)!!
         val enableDnsRouting = findPreference<SwitchPreference>(Key.ENABLE_DNS_ROUTING)!!
         val enableFakeDns = findPreference<SwitchPreference>(Key.ENABLE_FAKEDNS)!!
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            DataStore.directDnsUseSystem = false
-            directDnsUseSystem.remove()
-        } else {
-            directDns.isEnabled = !directDnsUseSystem.isChecked
-            directDnsUseSystem.setOnPreferenceChangeListener { _, newValue ->
-                directDns.isEnabled = !(newValue as Boolean)
-                needReload()
-                true
-            }
-        }
 
         val requireTransproxy = findPreference<SwitchPreference>(Key.REQUIRE_TRANSPROXY)!!
         val transproxyPort = findPreference<EditTextPreference>(Key.TRANSPROXY_PORT)!!
@@ -158,8 +144,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             entryValues = e
         }
 
-        val dnsNetwork = findPreference<MultiSelectListPreference>(Key.DNS_NETWORK)!!
-
         portLocalDns.setOnBindEditTextListener(EditTextPreferenceModifiers.Port)
         muxConcurrency.setOnBindEditTextListener(EditTextPreferenceModifiers.Port)
         mixedPort.setOnBindEditTextListener(EditTextPreferenceModifiers.Port)
@@ -185,6 +169,11 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             true
         }
 
+        serviceMode.setOnPreferenceChangeListener { _, _ ->
+            if (DataStore.serviceState.started) SagerNet.stopService()
+            true
+        }
+
         val tunImplementation = findPreference<SimpleMenuPreference>(Key.TUN_IMPLEMENTATION)!!
         val resolveDestination = findPreference<SwitchPreference>(Key.RESOLVE_DESTINATION)!!
         val acquireWakeLock = findPreference<SwitchPreference>(Key.ACQUIRE_WAKE_LOCK)!!
@@ -195,11 +184,9 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
             true
         }
 
-        serviceMode.onPreferenceChangeListener = reloadListener
         mixedPort.onPreferenceChangeListener = reloadListener
         appendHttpProxy.onPreferenceChangeListener = reloadListener
         showDirectSpeed.onPreferenceChangeListener = reloadListener
-//        domainStrategy.onPreferenceChangeListener = reloadListener
         trafficSniffing.onPreferenceChangeListener = reloadListener
         muxConcurrency.onPreferenceChangeListener = reloadListener
         tcpKeepAliveInterval.onPreferenceChangeListener = reloadListener
@@ -211,7 +198,6 @@ class SettingsPreferenceFragment : PreferenceFragmentCompat() {
         remoteDns.onPreferenceChangeListener = reloadListener
         directDns.onPreferenceChangeListener = reloadListener
         enableDnsRouting.onPreferenceChangeListener = reloadListener
-        dnsNetwork.onPreferenceChangeListener = reloadListener
 
         portLocalDns.onPreferenceChangeListener = reloadListener
         ipv6Mode.onPreferenceChangeListener = reloadListener

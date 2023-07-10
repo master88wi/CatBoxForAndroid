@@ -386,6 +386,11 @@
         <item>BASE64</item>
     </string-array>
 
+    <string-array name="tuic_version">
+        <item>5</item>
+        <item>4</item>
+    </string-array>
+
     <string-array name="socks_versions">
         <item>SOCKS4</item>
         <item>SOCKS4A</item>
@@ -440,10 +445,11 @@
     </string-array>
 
     <string-array name="dns_network_select">
-        <item>NoRemoteIPv4</item>
-        <item>NoRemoteIPv6</item>
-        <item>NoDirectIPv4</item>
-        <item>NoDirectIPv6</item>
+        <item>auto</item>
+        <item>prefer_ipv6</item>
+        <item>prefer_ipv4</item>
+        <item>ipv4_only</item>
+        <item>ipv6_only</item>
     </string-array>
 
     <string-array name="exe_prefer_provider">
@@ -515,6 +521,12 @@
     <string-array name="shadowtls_version_value">
         <item>2</item>
         <item>3</item>
+    </string-array>
+
+    <string-array name="traffic_sniffing_values">
+        <item>@string/off</item>
+        <item>@string/sniff_routing</item>
+        <item>@string/sniff_override</item>
     </string-array>
 
 </resources>

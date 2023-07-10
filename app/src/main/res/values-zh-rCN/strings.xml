@@ -334,7 +334,6 @@
     <string name="clear_profiles_message">您确定要清空该分组吗\?</string>
     <string name="remote_dns">远程 DNS</string>
     <string name="direct_dns">直连 DNS</string>
-    <string name="direct_dns_use_system">使用系统 DNS 作为直连 DNS</string>
     <string name="enable_dns_routing">启用 DNS 路由</string>
     <string name="dns_routing_message">使用直连 DNS 解析绕过路由中的 domains. 注意潜在的 DNS 泄漏</string>
     <string name="enable_fakedns">启用 FakeDNS</string>
@@ -442,7 +441,9 @@
     <string name="create_shortcut">创建快捷方式</string>
     <string name="app_tls_version">订阅最低 TLS 版本</string>
     <string name="hop_interval">端口跳跃间隔(秒)</string>
-    <string name="dns_network">DNS 查询类型</string>
+    <string name="domain_strategy_for_remote">域名策略（远程）</string>
+    <string name="domain_strategy_for_direct">域名策略（直连）</string>
+    <string name="domain_strategy_for_server">域名策略（服务器地址）</string>
     <string name="tuic_disable_sni">禁用 SNI</string>
     <string name="tuic_reduce_rtt">启用 0-RTT QUIC 握手</string>
     <string name="tuic_fast_connect">TCP 快速打开</string>
@@ -465,7 +466,7 @@
     <string name="use_selector">启用 selector （免重载切换节点）</string>
     <string name="front_proxy">前置代理</string>
     <string name="landing_proxy">落地代理</string>
-    <string name="shadowtls_version">ShadowTLS 版本</string>
+    <string name="protocol_version">协议版本</string>
     <string name="share_subscription">分享订阅</string>
     <string name="show_group_in_notification">在通知中显示组名</string>
     <string name="reset_connections">重置连接</string>
@@ -475,4 +476,9 @@
     <string name="log_level_help">长按设置项以设置缓冲区大小。</string>
     <string name="test_concurrency">测试并发</string>
     <string name="mux_type">Mux 协议</string>
+    <string name="sniff_routing">探测结果用于路由判断</string>
+    <string name="sniff_override">探测结果用于目标地址</string>
+    <string name="resolve_server">根据 IPv6 策略解析服务器地址</string>
+    <string name="auto_select_proxy_apps">自动选择需要代理的应用</string>
+    <string name="auto_select_proxy_apps_message">自动选择需要代理的应用，这将清除您当前的选择。</string>
 </resources>

@@ -4,6 +4,7 @@ import android.Manifest.permission.POST_NOTIFICATIONS
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -50,6 +51,10 @@ class MainActivity : ThemedActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        window?.apply {
+            statusBarColor = Color.TRANSPARENT
+        }
+
         binding = LayoutMainBinding.inflate(layoutInflater)
         binding.fab.initProgress(binding.fabProgress)
         if (themeResId !in intArrayOf(
@@ -93,7 +98,7 @@ class MainActivity : ThemedActivity(),
             if (checkPermission != PackageManager.PERMISSION_GRANTED) {
                 //动态申请
                 ActivityCompat.requestPermissions(
-                    this@MainActivity, arrayOf<String>(POST_NOTIFICATIONS), 0
+                    this@MainActivity, arrayOf(POST_NOTIFICATIONS), 0
                 )
             }
         }
@@ -104,6 +109,7 @@ class MainActivity : ThemedActivity(),
     fun refreshNavMenu(clashApi: Boolean) {
         if (::navigation.isInitialized) {
             navigation.menu.findItem(R.id.nav_traffic)?.isVisible = clashApi
+            navigation.menu.findItem(R.id.nav_tuiguang)?.isVisible = !isPlay
         }
     }
 
@@ -321,7 +327,7 @@ class MainActivity : ThemedActivity(),
 
             R.id.nav_about -> displayFragment(AboutFragment())
             R.id.nav_tuiguang -> {
-                launchCustomTab("https://matsuricom.github.io/")
+                launchCustomTab("https://matsuricom.pages.dev/")
                 return false
             }
 
@@ -329,19 +335,6 @@ class MainActivity : ThemedActivity(),
         }
         navigation.menu.findItem(id).isChecked = true
         return true
-    }
-
-    @SuppressLint("CommitTransaction")
-    fun ruleCreated() {
-        navigation.menu.findItem(R.id.nav_route).isChecked = true
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_holder, RouteFragment())
-            .commitAllowingStateLoss()
-        if (DataStore.serviceState.started) {
-            snackbar(getString(R.string.need_reload)).setAction(R.string.apply) {
-                SagerNet.reloadService()
-            }.show()
-        }
     }
 
     private fun changeState(
@@ -367,18 +360,6 @@ class MainActivity : ThemedActivity(),
 
     override fun stateChanged(state: BaseService.State, profileName: String?, msg: String?) {
         changeState(state, msg, true)
-    }
-
-    override fun routeAlert(type: Int, routeName: String) {
-        when (type) {
-            0 -> {
-                // need vpn
-
-                Toast.makeText(
-                    this, getString(R.string.route_need_vpn, routeName), Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
     }
 
     val connection = SagerConnection(SagerConnection.CONNECTION_ID_MAIN_ACTIVITY_FOREGROUND, true)

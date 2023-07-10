@@ -29,6 +29,7 @@ import io.nekohasekai.sagernet.widget.UndoSnackbarManager
 import kotlinx.coroutines.delay
 import moe.matsuri.nb4a.utils.Util
 import moe.matsuri.nb4a.utils.toBytesString
+import java.lang.NumberFormatException
 import java.util.*
 
 class GroupFragment : ToolbarFragment(R.layout.layout_group),
@@ -111,6 +112,7 @@ class GroupFragment : ToolbarFragment(R.layout.layout_group),
             R.id.action_new_group -> {
                 startActivity(Intent(context, GroupSettingsActivity::class.java))
             }
+
             R.id.action_update_all -> {
                 MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.confirm)
                     .setMessage(R.string.update_all_subscription)
@@ -339,9 +341,11 @@ class GroupFragment : ToolbarFragment(R.layout.layout_group),
                         proxyGroup.toUniversalLink(), proxyGroup.displayName()
                     ).showAllowingStateLoss(parentFragmentManager)
                 }
+
                 R.id.action_universal_clipboard -> {
                     export(proxyGroup.toUniversalLink())
                 }
+
                 R.id.action_export_clipboard -> {
                     runOnDefaultDispatcher {
                         val profiles = SagerDatabase.proxyDao.getByGroup(selectedGroup.id)
@@ -352,9 +356,11 @@ class GroupFragment : ToolbarFragment(R.layout.layout_group),
                         }
                     }
                 }
+
                 R.id.action_export_file -> {
                     startFilesForResult(exportProfiles, "profiles_${proxyGroup.displayName()}.txt")
                 }
+
                 R.id.action_clear -> {
                     MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.confirm)
                         .setMessage(R.string.clear_profiles_message)
@@ -436,17 +442,17 @@ class GroupFragment : ToolbarFragment(R.layout.layout_group),
             if (subscription != null && subscription.bytesUsed > 0L) { // SIP008 & Open Online Config
                 groupTraffic.isVisible = true
                 groupTraffic.text = if (subscription.bytesRemaining > 0L) {
-                    getString(
+                    app.getString(
                         R.string.subscription_traffic, Formatter.formatFileSize(
-                            context, subscription.bytesUsed
+                            app, subscription.bytesUsed
                         ), Formatter.formatFileSize(
-                            context, subscription.bytesRemaining
+                            app, subscription.bytesRemaining
                         )
                     )
                 } else {
-                    getString(
+                    app.getString(
                         R.string.subscription_used, Formatter.formatFileSize(
-                            context, subscription.bytesUsed
+                            app, subscription.bytesUsed
                         )
                     )
                 }
@@ -460,27 +466,31 @@ class GroupFragment : ToolbarFragment(R.layout.layout_group),
                     }.firstOrNull()
                 }
 
-                var used: Long = 0
-                get("upload=([0-9]+)")?.apply {
-                    used += toLong()
-                }
-                get("download=([0-9]+)")?.apply {
-                    used += toLong()
-                }
-                val total = get("total=([0-9]+)")?.toLong() ?: 0
-                if (used > 0 || total > 0) {
-                    text += getString(
-                        R.string.subscription_traffic,
-                        used.toBytesString(),
-                        (total - used).toBytesString()
-                    )
-                }
-                get("expire=([0-9]+)")?.apply {
-                    text += "\n"
-                    text += getString(
-                        R.string.subscription_expire,
-                        Util.timeStamp2Text(this.toLong() * 1000)
-                    )
+                try {
+                    var used: Long = 0
+                    get("upload=([0-9]+)")?.apply {
+                        used += toLong()
+                    }
+                    get("download=([0-9]+)")?.apply {
+                        used += toLong()
+                    }
+                    val total = get("total=([0-9]+)")?.toLong() ?: 0
+                    if (used > 0 || total > 0) {
+                        text += getString(
+                            R.string.subscription_traffic,
+                            used.toBytesString(),
+                            (total - used).toBytesString()
+                        )
+                    }
+                    get("expire=([0-9]+)")?.apply {
+                        text += "\n"
+                        text += getString(
+                            R.string.subscription_expire,
+                            Util.timeStamp2Text(this.toLong() * 1000)
+                        )
+                    }
+                } catch (_: NumberFormatException) {
+                    // ignore
                 }
 
                 if (text.isNotEmpty()) {
@@ -506,6 +516,7 @@ class GroupFragment : ToolbarFragment(R.layout.layout_group),
                                 groupStatus.text = getString(R.string.group_status_proxies, size)
                             }
                         }
+
                         GroupType.SUBSCRIPTION -> {
                             groupStatus.text = if (size == 0L) {
                                 getString(R.string.group_status_empty_subscription)

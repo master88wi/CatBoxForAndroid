@@ -44,7 +44,6 @@ class SagerConnection(
         fun stateChanged(state: BaseService.State, profileName: String?, msg: String?)
 
         fun missingPlugin(profileName: String, pluginName: String) {}
-        fun routeAlert(type: Int, routeName: String) {}
 
         fun onServiceConnected(service: ISagerNetService)
 
@@ -98,13 +97,6 @@ class SagerConnection(
             }
         }
 
-        override fun routeAlert(type: Int, routeName: String) {
-            val callback = callback ?: return
-            runOnMainDispatcher {
-                callback.routeAlert(type, routeName)
-            }
-        }
-
     }
 
     private var binder: IBinder? = null
@@ -113,7 +105,11 @@ class SagerConnection(
 
     fun updateConnectionId(id: Int) {
         connectionId = id
-        service?.registerCallback(serviceCallback, id)
+        try {
+            service?.registerCallback(serviceCallback, id)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     override fun onServiceConnected(name: ComponentName?, binder: IBinder) {
