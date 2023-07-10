@@ -2,12 +2,13 @@ package libcore
 
 import (
 	"libcore/device"
-	"log"
 	"os"
 	"path/filepath"
 	"runtime"
-	"time"
+	"strings"
 	_ "unsafe"
+
+	"log"
 
 	"github.com/matsuridayo/libneko/neko_common"
 	"github.com/matsuridayo/libneko/neko_log"
@@ -35,6 +36,7 @@ func InitCore(process, cachePath, internalAssets, externalAssets string,
 	if1 NB4AInterface, if2 BoxPlatformInterface,
 ) {
 	defer device.DeferPanicToError("InitCore", func(err error) { log.Println(err) })
+	isBgProcess := strings.HasSuffix(process, ":bg")
 
 	neko_common.RunMode = neko_common.RunMode_NekoBoxForAndroid
 	intfNB4A = if1
@@ -69,8 +71,14 @@ func InitCore(process, cachePath, internalAssets, externalAssets string,
 		externalAssetsPath = externalAssets
 		internalAssetsPath = internalAssets
 
-		if time.Now().Unix() >= GetExpireTime() {
-			outdated = "Your version is too old! Please update!! 版本太旧，请升级！"
+		// if time.Now().Unix() >= GetExpireTime() {
+		// 	outdated = "Your version is too old! Please update!! 版本太旧，请升级！"
+		// }
+
+		// certs
+		pem, err := os.ReadFile(externalAssetsPath + "ca.pem")
+		if err == nil {
+			updateRootCACerts(pem)
 		}
 
 		// bg
