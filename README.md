@@ -49,7 +49,10 @@ Please visit [here](https://hystericaldragon.github.io/matsuridayo.github.io/m-p
 * Raw: some widely used formats (like shadowsocks, clash and v2rayN)
 * 原始格式：一些广泛使用的格式（如 shadowsocks、clash 和 v2rayN）
 
-## Credits
+# Credits
+
+Dashbroad:
+- [Yacd-meta](https://github.com/MetaCubeX/Yacd-meta)
 
 Core:
 - [SagerNet/sing-box](https://github.com/SagerNet/sing-box)
