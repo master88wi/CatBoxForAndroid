@@ -99,7 +99,7 @@ class AboutFragment : ToolbarFragment(R.layout.layout_about) {
                         .subText(R.string.donate_info)
                         .setOnClickAction {
                             requireContext().launchCustomTab(
-                                "https://matsuridayo.github.io/index_docs/#donate"
+                                "https://hystericaldragon.github.io/matsuridayo.github.io/index_docs/#donate"
                             )
                         }
                         .build())

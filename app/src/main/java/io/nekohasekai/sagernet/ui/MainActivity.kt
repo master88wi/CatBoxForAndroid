@@ -250,7 +250,7 @@ class MainActivity : ThemedActivity(),
             }
             .setNeutralButton(android.R.string.cancel, null)
             .setNeutralButton(R.string.action_learn_more) { _, _ ->
-                launchCustomTab("https://matsuridayo.github.io/m-plugin/")
+                launchCustomTab("https://hystericaldragon.github.io/matsuridayo.github.io/m-plugin/")
             }
             .show()
     }
@@ -321,13 +321,13 @@ class MainActivity : ThemedActivity(),
             R.id.nav_tools -> displayFragment(ToolsFragment())
             R.id.nav_logcat -> displayFragment(LogcatFragment())
             R.id.nav_faq -> {
-                launchCustomTab("https://matsuridayo.github.io/")
+                launchCustomTab("https://hystericaldragon.github.io/matsuridayo.github.io/")
                 return false
             }
 
             R.id.nav_about -> displayFragment(AboutFragment())
             R.id.nav_tuiguang -> {
-                launchCustomTab("https://matsuricom.pages.dev/")
+                launchCustomTab("about:blank")
                 return false
             }
 
