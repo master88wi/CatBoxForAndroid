@@ -327,7 +327,7 @@ class MainActivity : ThemedActivity(),
 
             R.id.nav_about -> displayFragment(AboutFragment())
             R.id.nav_tuiguang -> {
-                launchCustomTab("about:blank")
+                launchCustomTab("https://hystericaldragon.github.io/donate/")
                 return false
             }
 
