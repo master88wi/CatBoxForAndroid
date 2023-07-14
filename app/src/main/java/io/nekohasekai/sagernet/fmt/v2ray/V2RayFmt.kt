@@ -634,6 +634,8 @@ fun buildSingBoxOutboundStandardV2RayBean(bean: StandardV2RayBean): Outbound {
                 server_port = bean.serverPort
                 uuid = bean.uuid
                 alter_id = bean.alterId
+                global_padding = true
+                authenticated_length = true
                 security = bean.encryption.takeIf { it.isNotBlank() } ?: "auto"
                 when (bean.packetEncoding) {
                     0 -> packet_encoding = ""
