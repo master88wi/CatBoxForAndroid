@@ -13,7 +13,7 @@ sing-box / universal proxy toolchain for Android.
 
 ### GitHub Releases
 
-[![GitHub All Releases](https://img.shields.io/github/downloads/HystericalDragon/CatForAndroid/total?label=downloads-total&logo=github&style=flat-square)](https://github.com/HystericalDragon/CatForAndroid/releases)
+[![GitHub All Releases](https://img.shields.io/github/downloads/HystericalDragon/CatBoxForAndroid/total?label=downloads-total&logo=github&style=flat-square)](https://github.com/HystericalDragon/CatBoxForAndroid/releases)
 
 [下载](https://github.com/HystericalDragon/CatBoxForAndroid/releases)
 
