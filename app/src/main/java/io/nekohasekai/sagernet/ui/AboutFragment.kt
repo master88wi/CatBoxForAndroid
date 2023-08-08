@@ -83,7 +83,7 @@ class AboutFragment : ToolbarFragment(R.layout.layout_about) {
                         .subText(versionName)
                         .setOnClickAction {
                             requireContext().launchCustomTab(
-                                "https://github.com/HystericalDragon/CatForAndroid/releases"
+                                "https://github.com/AntiNeko/CatForAndroid/releases"
                             )
                         }
                         .build())
@@ -99,7 +99,7 @@ class AboutFragment : ToolbarFragment(R.layout.layout_about) {
                         .subText(R.string.donate_info)
                         .setOnClickAction {
                             requireContext().launchCustomTab(
-                                "https://hystericaldragon.github.io/matsuridayo.github.io/index_docs/#donate"
+                                "https://HystericalDragon.github.io/donate"
                             )
                         }
                         .build())
@@ -162,7 +162,7 @@ class AboutFragment : ToolbarFragment(R.layout.layout_about) {
                         .text(R.string.github)
                         .setOnClickAction {
                             requireContext().launchCustomTab(
-                                "https://github.com/HystericalDragon/CatForAndroid"
+                                "https://github.com/AntiNeko/CatForAndroid"
 
                             )
                         }
