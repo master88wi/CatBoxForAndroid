@@ -21,9 +21,17 @@ sing-box / universal proxy toolchain for Android.
 
 ### F-Droid
 
-[![IzzySoft](https://img.shields.io/badge/F--droid-IzzySoft-blue?logo=fdroid)](https://apt.izzysoft.de/fdroid/)
+[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
+    alt="Get it on F-Droid"
+    height="80">](https://f-droid.org/packages/moe.cb4a)
 
-[下载 (IzzySoft)](https://apt.izzysoft.de/fdroid/index/apk/moe.cb4a)
+[F-Droid](https://f-droid.org/packages/moe.cb4a)
+
+[<img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png"
+    alt="Get it on IzzySoft"
+    height="80">](https://apt.izzysoft.de/fdroid/index/apk/moe.cb4a)
+
+[F-Droid(IzzySoft)](https://apt.izzysoft.de/fdroid/index/apk/moe.cb4a)
 
 ## 更改记录 & 发布频道 / Changelog & Telegram channel
 
