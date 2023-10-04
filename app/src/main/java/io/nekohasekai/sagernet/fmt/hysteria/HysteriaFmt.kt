@@ -2,8 +2,17 @@ package io.nekohasekai.sagernet.fmt.hysteria
 
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.fmt.LOCALHOST
-import io.nekohasekai.sagernet.ktx.*
+import io.nekohasekai.sagernet.ktx.getBool
+import io.nekohasekai.sagernet.ktx.getIntNya
+import io.nekohasekai.sagernet.ktx.getStr
+import io.nekohasekai.sagernet.ktx.isIpAddress
+import io.nekohasekai.sagernet.ktx.linkBuilder
+import io.nekohasekai.sagernet.ktx.toLink
+import io.nekohasekai.sagernet.ktx.toStringPretty
+import io.nekohasekai.sagernet.ktx.urlSafe
+import io.nekohasekai.sagernet.ktx.wrapIPV6Host
 import moe.matsuri.nb4a.SingBoxOptions
+import moe.matsuri.nb4a.SingBoxOptions.OutboundECHOptions
 import moe.matsuri.nb4a.utils.listByLineOrComma
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.json.JSONObject
@@ -311,6 +320,15 @@ fun buildSingBoxOutboundHysteriaBean(bean: HysteriaBean): MutableMap<String, Any
                 if (bean.caText.isNotBlank()) {
                     certificate = bean.caText
                 }
+                if (bean.ech) {
+                    val echList = bean.echCfg.split("\n")
+                    ech = OutboundECHOptions().apply {
+                        enabled = true
+                        pq_signature_schemes_enabled = echList.size > 5
+                        dynamic_record_sizing_disabled = true
+                        config = echList
+                    }
+                }
                 insecure = bean.allowInsecure
                 enabled = true
             }
@@ -349,6 +367,15 @@ fun buildSingBoxOutboundHysteriaBean(bean: HysteriaBean): MutableMap<String, Any
                 alpn = listOf("h3")
                 if (bean.caText.isNotBlank()) {
                     certificate = bean.caText
+                }
+                if (bean.ech) {
+                    val echList = bean.echCfg.split("\n")
+                    ech = OutboundECHOptions().apply {
+                        enabled = true
+                        pq_signature_schemes_enabled = echList.size > 5
+                        dynamic_record_sizing_disabled = true
+                        config = echList
+                    }
                 }
                 insecure = bean.allowInsecure
                 enabled = true

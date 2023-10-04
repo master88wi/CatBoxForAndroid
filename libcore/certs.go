@@ -4,6 +4,8 @@ import (
 	"crypto/x509"
 	"log"
 	_ "unsafe" // for go:linkname
+
+	scribe "github.com/AntiNeko/TLS-scribe"
 )
 
 //go:linkname systemRoots crypto/x509.systemRoots
@@ -22,3 +24,12 @@ func updateRootCACerts(pem []byte) {
 
 //go:linkname initSystemRoots crypto/x509.initSystemRoots
 func initSystemRoots()
+
+func PinCert(target, serverName string) string {
+	r, err := scribe.Execute(target, "pem", serverName)
+	if err != nil {
+		return ""
+	}
+
+	return r
+}

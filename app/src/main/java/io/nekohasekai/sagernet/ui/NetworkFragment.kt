@@ -36,6 +36,10 @@ class NetworkFragment : NamedFragment(R.layout.layout_network) {
                 generateWarpConfiguration()
             }
         }
+
+        binding.getCert.setOnClickListener {
+            startActivity(Intent(requireContext(), GetCertActivity::class.java))
+        }
     }
 
     suspend fun generateWarpConfiguration() {

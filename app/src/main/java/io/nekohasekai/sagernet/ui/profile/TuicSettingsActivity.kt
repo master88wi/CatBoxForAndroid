@@ -28,6 +28,8 @@ class TuicSettingsActivity : ProfileSettingsActivity<TuicBean>() {
         DataStore.serverSNI = sni
         DataStore.serverReduceRTT = reduceRTT
         DataStore.serverAllowInsecure = allowInsecure
+        DataStore.ech = ech
+        DataStore.echCfg = echCfg
 
         DataStore.profileCacheStore.putBoolean("sUoT", sUoT)
     }
@@ -46,6 +48,8 @@ class TuicSettingsActivity : ProfileSettingsActivity<TuicBean>() {
         sni = DataStore.serverSNI
         reduceRTT = DataStore.serverReduceRTT
         allowInsecure = DataStore.serverAllowInsecure
+        ech = DataStore.ech
+        echCfg = DataStore.echCfg
 
         sUoT = DataStore.profileCacheStore.getBoolean("sUoT")
     }

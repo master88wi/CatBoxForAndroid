@@ -18,6 +18,11 @@ public class HysteriaBean extends AbstractBean {
     // Use serverPorts instead of serverPort
     public String serverPorts;
 
+    // ECH
+
+    public Boolean ech;
+    public String echCfg;
+
     // HY1 & 2
 
     public String authPayload;
@@ -78,6 +83,9 @@ public class HysteriaBean extends AbstractBean {
         if (disableMtuDiscovery == null) disableMtuDiscovery = false;
         if (hopInterval == null) hopInterval = 10;
         if (serverPorts == null) serverPorts = "443";
+
+        if (ech == null) ech = false;
+        if (echCfg == null) echCfg = "";
     }
 
     @Override
@@ -104,6 +112,10 @@ public class HysteriaBean extends AbstractBean {
         output.writeBoolean(disableMtuDiscovery);
         output.writeInt(hopInterval);
         output.writeString(serverPorts);
+
+        output.writeBoolean(ech);
+        output.writeString(echCfg);
+
     }
 
     @Override
@@ -148,6 +160,9 @@ public class HysteriaBean extends AbstractBean {
                 serverPorts = serverPort.toString();
             }
         }
+
+        ech = input.readBoolean();
+        echCfg = input.readString();
     }
 
     @Override
@@ -159,6 +174,8 @@ public class HysteriaBean extends AbstractBean {
         bean.allowInsecure = allowInsecure;
         bean.disableMtuDiscovery = disableMtuDiscovery;
         bean.hopInterval = hopInterval;
+        bean.ech = ech;
+        bean.echCfg = echCfg;
     }
 
     @Override

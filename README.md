@@ -27,15 +27,9 @@ sing-box / universal proxy toolchain for Android.
 
 [F-Droid](https://f-droid.org/packages/moe.cb4a)
 
-[<img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png"
-    alt="Get it on IzzySoft"
-    height="80">](https://apt.izzysoft.de/fdroid/index/apk/moe.cb4a)
-
-[F-Droid(IzzySoft)](https://apt.izzysoft.de/fdroid/index/apk/moe.cb4a)
-
 ## 更改记录 & 发布频道 / Changelog & Telegram channel
 
-https://t.me/AntiNek0
+<https://t.me/AntiNek0>
 
 ## 项目主页 & 文档 / Homepage & Documents
 

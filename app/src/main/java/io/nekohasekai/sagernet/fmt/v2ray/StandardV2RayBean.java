@@ -40,6 +40,12 @@ public abstract class StandardV2RayBean extends AbstractBean {
 
     public String realityShortId;
 
+    // --------------------------------------- ECH
+
+    public Boolean ech;
+
+    public String echCfg;
+
 
     // --------------------------------------- //
 
@@ -84,6 +90,9 @@ public abstract class StandardV2RayBean extends AbstractBean {
 
         if (realityPubKey == null) realityPubKey = "";
         if (realityShortId == null) realityShortId = "";
+
+        if (ech == null) ech = false;
+        if (echCfg == null) echCfg = "";
     }
 
     @Override
@@ -129,6 +138,8 @@ public abstract class StandardV2RayBean extends AbstractBean {
             output.writeString(utlsFingerprint);
             output.writeString(realityPubKey);
             output.writeString(realityShortId);
+            output.writeBoolean(ech);
+            output.writeString(echCfg);
         }
 
         output.writeInt(packetEncoding);
@@ -176,6 +187,8 @@ public abstract class StandardV2RayBean extends AbstractBean {
             utlsFingerprint = input.readString();
             realityPubKey = input.readString();
             realityShortId = input.readString();
+            ech = input.readBoolean();
+            echCfg = input.readString();
         }
 
         packetEncoding = input.readInt();
@@ -188,6 +201,8 @@ public abstract class StandardV2RayBean extends AbstractBean {
         bean.allowInsecure = allowInsecure;
         bean.utlsFingerprint = utlsFingerprint;
         bean.packetEncoding = packetEncoding;
+        bean.ech = ech;
+        bean.echCfg = echCfg;
     }
 
     public boolean isVLESS() {

@@ -43,9 +43,6 @@ object Key {
 
     const val APPEND_HTTP_PROXY = "appendHttpProxy"
 
-    const val REQUIRE_TRANSPROXY = "requireTransproxy"
-    const val TRANSPROXY_MODE = "transproxyMode"
-    const val TRANSPROXY_PORT = "transproxyPort"
     const val CONNECTION_TEST_URL = "connectionTestURL"
 
     const val TCP_KEEP_ALIVE_INTERVAL = "tcpKeepAliveInterval"
@@ -98,10 +95,14 @@ object Key {
 
     const val SERVER_SECURITY_CATEGORY = "serverSecurityCategory"
     const val SERVER_TLS_CAMOUFLAGE_CATEGORY = "serverTlsCamouflageCategory"
+    const val SERVER_ECH_CATEGORY = "serverEchCategory"
     const val SERVER_WS_CATEGORY = "serverWsCategory"
     const val SERVER_SS_CATEGORY = "serverSsCategory"
     const val SERVER_HEADERS = "serverHeaders"
     const val SERVER_ALLOW_INSECURE = "serverAllowInsecure"
+
+    const val ECH = "ech"
+    const val ECH_CFG = "echCfg"
 
     const val SERVER_AUTH_TYPE = "serverAuthType"
     const val SERVER_UPLOAD_SPEED = "serverUploadSpeed"

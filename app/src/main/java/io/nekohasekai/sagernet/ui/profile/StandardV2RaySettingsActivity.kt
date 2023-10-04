@@ -43,6 +43,8 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
     private val utlsFingerprint = pbm.add(PreferenceBinding(Type.Text, "utlsFingerprint"))
     private val realityPubKey = pbm.add(PreferenceBinding(Type.Text, "realityPubKey"))
     private val realityShortId = pbm.add(PreferenceBinding(Type.Text, "realityShortId"))
+    private val ech = pbm.add(PreferenceBinding(Type.Bool, "ech"))
+    private val echCfg = pbm.add(PreferenceBinding(Type.Text, "echCfg"))
 
     override fun StandardV2RayBean.init() {
         if (this is TrojanBean) {
@@ -60,6 +62,7 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
 
     lateinit var securityCategory: PreferenceCategory
     lateinit var tlsCamouflageCategory: PreferenceCategory
+    lateinit var echCategory: PreferenceCategory
     lateinit var wsCategory: PreferenceCategory
 
     override fun PreferenceFragmentCompat.createPreferences(
@@ -70,6 +73,7 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
         pbm.setPreferenceFragment(this)
         securityCategory = findPreference(Key.SERVER_SECURITY_CATEGORY)!!
         tlsCamouflageCategory = findPreference(Key.SERVER_TLS_CAMOUFLAGE_CATEGORY)!!
+        echCategory = findPreference(Key.SERVER_ECH_CATEGORY)!!
         wsCategory = findPreference(Key.SERVER_WS_CATEGORY)!!
 
 
@@ -170,6 +174,7 @@ abstract class StandardV2RaySettingsActivity : ProfileSettingsActivity<StandardV
         val isTLS = tle == "tls"
         securityCategory.isVisible = isTLS
         tlsCamouflageCategory.isVisible = isTLS
+        echCategory.isVisible = isTLS
     }
 
 }

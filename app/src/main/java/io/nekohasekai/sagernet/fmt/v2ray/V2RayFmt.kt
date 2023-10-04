@@ -4,8 +4,26 @@ import android.text.TextUtils
 import com.google.gson.Gson
 import io.nekohasekai.sagernet.fmt.http.HttpBean
 import io.nekohasekai.sagernet.fmt.trojan.TrojanBean
-import io.nekohasekai.sagernet.ktx.*
-import moe.matsuri.nb4a.SingBoxOptions.*
+import io.nekohasekai.sagernet.ktx.Logs
+import io.nekohasekai.sagernet.ktx.decodeBase64UrlSafe
+import io.nekohasekai.sagernet.ktx.getStr
+import io.nekohasekai.sagernet.ktx.linkBuilder
+import io.nekohasekai.sagernet.ktx.readableMessage
+import io.nekohasekai.sagernet.ktx.toLink
+import io.nekohasekai.sagernet.ktx.urlSafe
+import moe.matsuri.nb4a.SingBoxOptions.Outbound
+import moe.matsuri.nb4a.SingBoxOptions.OutboundECHOptions
+import moe.matsuri.nb4a.SingBoxOptions.OutboundRealityOptions
+import moe.matsuri.nb4a.SingBoxOptions.OutboundTLSOptions
+import moe.matsuri.nb4a.SingBoxOptions.OutboundUTLSOptions
+import moe.matsuri.nb4a.SingBoxOptions.Outbound_HTTPOptions
+import moe.matsuri.nb4a.SingBoxOptions.Outbound_TrojanOptions
+import moe.matsuri.nb4a.SingBoxOptions.Outbound_VLESSOptions
+import moe.matsuri.nb4a.SingBoxOptions.Outbound_VMessOptions
+import moe.matsuri.nb4a.SingBoxOptions.V2RayTransportOptions
+import moe.matsuri.nb4a.SingBoxOptions.V2RayTransportOptions_GRPCOptions
+import moe.matsuri.nb4a.SingBoxOptions.V2RayTransportOptions_HTTPOptions
+import moe.matsuri.nb4a.SingBoxOptions.V2RayTransportOptions_WebsocketOptions
 import moe.matsuri.nb4a.utils.NGUtil
 import moe.matsuri.nb4a.utils.listByLineOrComma
 import okhttp3.HttpUrl
@@ -615,6 +633,15 @@ fun buildSingBoxOutboundTLS(bean: StandardV2RayBean): OutboundTLSOptions? {
                 enabled = true
                 public_key = bean.realityPubKey
                 short_id = bean.realityShortId
+            }
+        }
+        if (bean.ech) {
+            val echList = bean.echCfg.split("\n")
+            ech = OutboundECHOptions().apply {
+                enabled = true
+                pq_signature_schemes_enabled = echList.size > 5
+                dynamic_record_sizing_disabled = true
+                config = echList
             }
         }
     }

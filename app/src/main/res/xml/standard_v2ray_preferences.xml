@@ -143,4 +143,18 @@
             app:useSimpleSummaryProvider="true" />
     </PreferenceCategory>
 
+    <PreferenceCategory
+        app:key="serverEchCategory"
+        app:title="ECH">
+        <SwitchPreference
+            app:icon="@drawable/ic_baseline_security_24"
+            app:key="ech"
+            app:title="@string/enable" />
+        <EditTextPreference
+            app:icon="@drawable/ic_baseline_nfc_24"
+            app:key="echCfg"
+            app:title="@string/ech_config"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+
 </PreferenceScreen>
