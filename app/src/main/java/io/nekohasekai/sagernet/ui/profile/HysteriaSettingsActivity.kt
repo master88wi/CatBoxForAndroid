@@ -94,6 +94,8 @@ class HysteriaSettingsActivity : ProfileSettingsActivity<HysteriaBean>() {
                     false
                 findPreference<SwitchPreference>(Key.SERVER_DISABLE_MTU_DISCOVERY)!!.isVisible =
                     false
+                //
+                authPayload.title = resources.getString(R.string.password)
             } else {
                 authType.isVisible = true
                 authPayload.isVisible = true
@@ -107,6 +109,8 @@ class HysteriaSettingsActivity : ProfileSettingsActivity<HysteriaBean>() {
                     true
                 findPreference<SwitchPreference>(Key.SERVER_DISABLE_MTU_DISCOVERY)!!.isVisible =
                     true
+                //
+                authPayload.title = resources.getString(R.string.hysteria_auth_payload)
             }
         }
         findPreference<SimpleMenuPreference>(Key.PROTOCOL_VERSION)!!.setOnPreferenceChangeListener { _, newValue ->

@@ -17,7 +17,12 @@ enum class PluginEntry(
     NaiveProxy(
         "naive-plugin",
         SagerNet.application.getString(R.string.action_naive),
-        "io.nekohasekai.sagernet.plugin.naive"
+        "io.nekohasekai.sagernet.plugin.naive",
+        DownloadSource(
+            playStore = false,
+            fdroid = false,
+            downloadLink = "https://github.com/AntiNeko/sing-plugin/releases?q=naive"
+        )
     ),
     Hysteria(
         "hysteria-plugin",
