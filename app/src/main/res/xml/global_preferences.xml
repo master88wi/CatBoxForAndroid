@@ -33,7 +33,7 @@
             app:title="@string/service_mode"
             app:useSimpleSummaryProvider="true" />
         <moe.matsuri.nb4a.ui.SimpleMenuPreference
-            app:defaultValue="1"
+            app:defaultValue="2"
             app:entries="@array/tun_implementation"
             app:entryValues="@array/int_array_3"
             app:icon="@drawable/ic_baseline_flip_camera_android_24"
@@ -98,6 +98,7 @@
             app:title="@string/proxied_apps" />
         <SwitchPreference
             app:icon="@drawable/ic_baseline_legend_toggle_24"
+            app:defaultValue="true"
             app:key="bypassLan"
             app:title="@string/route_opt_bypass_lan" />
         <SwitchPreference
@@ -117,7 +118,7 @@
             app:summary="@string/resolve_destination_summary"
             app:title="@string/resolve_destination" />
         <moe.matsuri.nb4a.ui.SimpleMenuPreference
-            app:defaultValue="0"
+            app:defaultValue="1"
             app:entries="@array/ipv6_mode"
             app:entryValues="@array/int_array_4"
             app:icon="@drawable/ic_image_looks_6"
@@ -160,7 +161,7 @@
 
     <PreferenceCategory app:title="@string/cag_dns">
         <EditTextPreference
-            app:defaultValue="https://8.8.8.8/dns-query"
+            app:defaultValue="https://dns.google/dns-query"
             app:icon="@drawable/ic_action_dns"
             app:key="remoteDns"
             app:title="@string/remote_dns"
@@ -182,7 +183,8 @@
             app:defaultValue="local"
             app:icon="@drawable/ic_action_dns"
             app:key="underlyingDns"
-            app:title="@string/underlying_dns" />
+            app:title="@string/underlying_dns"
+            app:useSimpleSummaryProvider="true" />
         <moe.matsuri.nb4a.ui.SimpleMenuPreference
             app:defaultValue="auto"
             app:entries="@array/dns_network_select"
